@@ -1,39 +1,33 @@
-from camera import StereoCamera
+from camera import Camera
 import depthai as dai
 import cv2 as cv
 import numpy as np
 
-camera = StereoCamera()
-device = camera.createStereoCamera()
+camera = Camera()
+device = camera.createColorCamera()
 
-# Get output queues. 
-leftQueue = device.getOutputQueue(name="left", maxSize=1)
-# maxSize -> Frame holding capacity
-rightQueue = device.getOutputQueue(name="right", maxSize=1)
+# Get output queue
+q_rgb = device.getOutputQueue(name="rgb", maxSize=1)
 
 # Set display window name
-cv.namedWindow("Stereo Pair")
-# Variable used to toggle between side by side view and one frame view.
-sideBySide = False
+cv.namedWindow("Color Camera")
+
 images = 0
 
 while True:
-    # Get left frame
-    leftFrame = camera.getFrame(leftQueue)
-    # Get right frame 
-    rightFrame = camera.getFrame(rightQueue)
+    imOut = None
+    # Get rgb frame
+    in_rgb = q_rgb.tryGet()
         
-    if sideBySide:
-        # Show side by side view
-        imOut = np.hstack((leftFrame, rightFrame))
-    else : 
-        # Show overlapping frames
-        imOut = np.uint8(leftFrame/2 + rightFrame/2)
+    if in_rgb is not None:
+        # If the packet from RGB camera is present, we're retrieving the frame in OpenCV format using getCvFrame
+        imOut = camera.getFrame(q_rgb)
         
     # Display output image
-    cv.imshow("Stereo Pair", imOut)
-    cv.imwrite(f"./images/{images}.jpg", imOut)
-    images+=1
+    if imOut is not None:
+        cv.imshow("Color Camera", imOut)
+        cv.imwrite(f"./images/{images}.jpg", imOut)
+        images+=1
     # Check for keyboard input
     key = cv.waitKey(1)
     if key == ord('q'):

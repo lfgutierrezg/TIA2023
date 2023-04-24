@@ -27,8 +27,17 @@ class Camera():
 
         return dai.Device(pipeline, usb2Mode=self.usb2mode)
     
-    def createColorCamera():
-        pass
+    def createColorCamera(self, previewSize = (500,500)):
+        pipeline = dai.Pipeline()
+        cam_rgb = pipeline.create(dai.node.ColorCamera)
+        cam_rgb.setPreviewSize(previewSize)
+        cam_rgb.setInterleaved(False)
+
+        xout_rgb = pipeline.create(dai.node.XLinkOut)
+        xout_rgb.setStreamName("rgb")
+        cam_rgb.preview.link(xout_rgb.input)
+
+        return dai.Device(pipeline, usb2Mode=self.usb2mode)
 
     def getFrame(self, queue):
         frame = queue.get()
