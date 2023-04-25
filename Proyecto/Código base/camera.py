@@ -27,7 +27,7 @@ class Camera():
 
         return dai.Device(pipeline, usb2Mode=self.usb2mode)
     
-    def createColorCamera(self, previewSize = (500,500)):
+    def createColorCamera(self, previewSize = (300,300)):
         pipeline = dai.Pipeline()
         cam_rgb = pipeline.create(dai.node.ColorCamera)
         cam_rgb.setPreviewSize(previewSize)
@@ -38,6 +38,11 @@ class Camera():
         cam_rgb.preview.link(xout_rgb.input)
 
         return dai.Device(pipeline, usb2Mode=self.usb2mode)
+    
+    def createStereoDepth(self, threshold):
+        pipeline = dai.Pipeline()
+        stereo_depth = pipeline.create(dai.node.StereoDepth)
+        stereo_depth.initialConfig.setConfidenceThreshold(threshold)
 
     def getFrame(self, queue):
         frame = queue.get()
@@ -45,7 +50,7 @@ class Camera():
 
     def getMonoCamera(self, pipeline, isLeft):
         mono = pipeline.createMonoCamera()
-        mono.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+        mono.setResolution(dai.MonoCameraProperties.SensorResolution.THE_800_P)
         if isLeft:
             mono.setBoardSocket(dai.CameraBoardSocket.LEFT)
         else:
