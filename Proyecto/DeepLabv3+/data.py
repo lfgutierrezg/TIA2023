@@ -68,13 +68,16 @@ def load_data(path, split=0.3):
     X = sorted(glob(os.path.join(path, "images", "*.jpg")))
     Y = sorted(glob(os.path.join(path, "masks", "*.png")))
 
-    """ Dividir la data en test y train y se usa 10% para train """
+    """ Dividir la data en test y train y se usa 70% para train """
     split_size = int(len(X) * split)
 
     train_x, test_x = train_test_split(X, test_size=split_size, random_state=42)
     train_y, test_y = train_test_split(Y, test_size=split_size, random_state=42)
+    split_size = int(len(test_x) * split)
+    test_x, valid_x = train_test_split(test_x, test_size=split_size, random_state=42)
+    test_y, valid_y = train_test_split(test_y, test_size=split_size, random_state=42)
 
-    return (train_x, train_y), (test_x, test_y)
+    return (train_x, train_y), (test_x, test_y),(valid_x, valid_y)
 
 def augment_data(images, masks, save_path, augment=True):
     H = 512
@@ -154,18 +157,22 @@ if __name__ == "__main__":
 
     """ Cargar el dataset """
     data_path = "people_segmentation"
-    (train_x, train_y), (test_x, test_y) = load_data(data_path)
+    (train_x, train_y), (test_x, test_y),(valid_x,valid_y) = load_data(data_path)
 
     print(f"Train:\t {len(train_x)} - {len(train_y)}")
     print(f"Test:\t {len(test_x)} - {len(test_y)}")
+    print(f"valid:\t {len(valid_x)} - {len(valid_y)}")
 
     """ crear directorios para guardar la data """
     create_dir("new_data/train/image/")
     create_dir("new_data/train/mask/")
+    create_dir("new_data/valid/image/")
+    create_dir("new_data/valid/mask/")
     create_dir("new_data/test/image/")
     create_dir("new_data/test/mask/")
 
     """ Data augmentation """
     augment_data(train_x, train_y, "new_data/train/", augment=True)
     augment_data(test_x, test_y, "new_data/test/", augment=False)
+    augment_data(valid_x, valid_y, "new_data/valid/", augment=False)
 

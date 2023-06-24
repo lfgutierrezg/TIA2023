@@ -70,17 +70,18 @@ def deeplabv3_plus(shape):
 
     image_features = encoder.get_layer("conv4_block6_out").output
     x_a = ASPP(image_features)
-    #print(x_a.shape)
+    print("End ASPP",x_a.shape)
     x_a = UpSampling2D((4, 4), interpolation="bilinear")(x_a)
-    #print(x_a.shape)
+    print("UP4x4",x_a.shape)
 
     x_b = encoder.get_layer("conv2_block2_out").output
-    #print(x_b.shape)
+    print("Encoder2,2",x_b.shape)
     x_b = Conv2D(filters=48, kernel_size=1, padding='same', use_bias=False)(x_b)
     x_b = BatchNormalization()(x_b)
     x_b = Activation('relu')(x_b)
-    #print(x_b.shape)
+    print("x_b",x_b.shape)
     x = Concatenate()([x_a, x_b])
+    print("x",x_b.shape)
     x = SqueezeAndExcite(x)
 
     x = Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False)(x)
@@ -105,3 +106,4 @@ def deeplabv3_plus(shape):
 
 if __name__ == "__main__":
     model = deeplabv3_plus((512, 512, 3))
+    model.summary()

@@ -73,7 +73,7 @@ if __name__ == "__main__":
     create_dir("files")
 
     """ Hyperparameters """
-    batch_size = 2
+    batch_size = 4
     lr = 1e-4
     num_epochs = 8
     model_path = os.path.join("files", "model.h5")
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     """ Dataset """
     dataset_path = "new_data"
     train_path = os.path.join(dataset_path, "train")
-    valid_path = os.path.join(dataset_path, "test")
+    valid_path = os.path.join(dataset_path, "valid")
     print(train_path)
 
     train_x, train_y = load_data(train_path)
